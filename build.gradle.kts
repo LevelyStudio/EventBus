@@ -26,8 +26,8 @@ kotlin {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            groupId = "gg.levely.eventbus"
-            artifactId = "eventbus"
+            groupId = "${project.group}.eventbus"
+            artifactId = "system"
             version = project.version.toString()
 
             from(components["java"])
