@@ -1,7 +1,7 @@
-package gg.levely.system
+package gg.levely.system.eventbus
 
-import gg.levely.system.context.DefaultEventContext
-import gg.levely.system.context.EventContext
+import gg.levely.system.eventbus.context.DefaultEventContext
+import gg.levely.system.eventbus.context.EventContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope

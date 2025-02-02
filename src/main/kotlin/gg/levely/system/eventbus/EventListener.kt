@@ -1,4 +1,4 @@
-package gg.levely.system
+package gg.levely.system.eventbus
 
 fun interface EventListener<in E> {
 

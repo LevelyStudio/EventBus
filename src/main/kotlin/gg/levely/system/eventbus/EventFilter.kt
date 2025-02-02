@@ -1,4 +1,4 @@
-package gg.levely.system
+package gg.levely.system.eventbus
 
 enum class EventFilter {
 
