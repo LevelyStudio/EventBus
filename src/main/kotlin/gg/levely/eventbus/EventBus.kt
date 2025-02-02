@@ -2,8 +2,11 @@ package gg.levely.eventbus
 
 import gg.levely.eventbus.context.DefaultEventContext
 import gg.levely.eventbus.context.EventContext
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.newSingleThreadContext
 import java.util.*
 import java.util.concurrent.PriorityBlockingQueue
 
@@ -15,6 +18,8 @@ import java.util.concurrent.PriorityBlockingQueue
  */
 class EventBus<T> {
 
+    @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    private val eventDispatcher = newSingleThreadContext("Event-Dispatcher")
     private val eventContexts: Queue<EventContext<*>> = PriorityBlockingQueue<EventContext<*>>(1, EventComparator())
 
 
@@ -77,11 +82,10 @@ class EventBus<T> {
     /**
      * Do the same as [publish] but asynchronously.
      */
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     fun <E : T> publishAsync(event: E) {
-        runBlocking {
-            launch {
-                publish(event)
-            }
+        GlobalScope.launch(eventDispatcher) {
+            publish(event)
         }
     }
 
