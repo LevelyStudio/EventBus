@@ -1,4 +1,4 @@
-package gg.levely.eventbus
+package gg.levely.system
 
 class EventPriority private constructor(val weight: Int) {
 

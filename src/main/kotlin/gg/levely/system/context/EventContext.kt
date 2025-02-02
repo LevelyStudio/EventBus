@@ -1,8 +1,8 @@
-package gg.levely.eventbus.context
+package gg.levely.system.context
 
-import gg.levely.eventbus.EventFilter
-import gg.levely.eventbus.EventListener
-import gg.levely.eventbus.EventPriority
+import gg.levely.system.EventFilter
+import gg.levely.system.EventListener
+import gg.levely.system.EventPriority
 
 interface EventContext<E> {
 
