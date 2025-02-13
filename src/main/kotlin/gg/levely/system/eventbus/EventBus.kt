@@ -14,6 +14,7 @@ import java.util.concurrent.PriorityBlockingQueue
  * The event bus manages listeners and allows you to trigger your own events.
  * @see [subscribe] to register a listener.
  * @see [publish] to trigger an event.
+ * @author Luke and Oleksandr
  */
 class EventBus<T> {
 
@@ -45,10 +46,10 @@ class EventBus<T> {
 
     /**
      * Allows you to unsubscribe any registered listener.
-     * @param eventClass The event type of the listener
+     * @param eventListener The listener to unsubscribe
      */
-    fun <E : T> unsubscribe(eventClass: Class<E>) {
-        eventContexts.removeIf { it.eventType == eventClass }
+    fun <E : T> unsubscribe(eventListener: EventListener<E>) {
+        eventContexts.removeIf { it.eventListener == eventListener }
     }
 
 
