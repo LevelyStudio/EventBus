@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation("gg.levely.system:eventbus:1.0.0")
+    implementation("gg.levely.system:eventbus:1.0.0")
 }
 ```
 
@@ -47,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "gg.levely.system:eventbus:1.0.0"
+    implementation "gg.levely.system:eventbus:1.0.0"
 }
 ```
 
@@ -113,9 +113,7 @@ eventBus.publishAsync(CustomEvent("Hello, EventBus!"))
 ### 5️⃣ Unregistering a Listener
 
 ```kotlin
-eventBus.unsubscribe(CustomEvent::class.java, EventListener { event ->
-    println("Event unsubscribe: ${event.message}")
-})
+eventBus.unsubscribe(CustomEvent::class.java)
 ```
 
 ### 🎯 Event Priorities
