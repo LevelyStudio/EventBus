@@ -1,7 +1,9 @@
 package gg.levely.system.eventbus
 
+import gg.levely.system.eventbus.logger.DebugLogger
 import gg.levely.system.eventbus.context.DefaultEventContext
 import gg.levely.system.eventbus.context.EventContext
+import gg.levely.system.eventbus.logger.EventType
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -16,11 +18,15 @@ import java.util.concurrent.PriorityBlockingQueue
  * @see [publish] to trigger an event.
  * @author Luke and Oleksandr
  */
-class EventBus<T> {
+class EventBus<T>(var enableLogger: Boolean = false) {
 
     @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val eventDispatcher = newSingleThreadContext("Event-Dispatcher")
     private val eventContexts: Queue<EventContext<*>> = PriorityBlockingQueue<EventContext<*>>(1, EventComparator())
+
+    private val logger = DebugLogger()
+    private val debugLogger: DebugLogger?
+        get() = if (enableLogger) logger else null
 
 
     /**
@@ -31,7 +37,8 @@ class EventBus<T> {
      */
     @JvmOverloads
     fun <E : T> subscribe(
-        eventClass: Class<E>, eventListener: EventListener<E>,
+        eventClass: Class<E>,
+        eventListener: EventListener<E>,
         eventPriority: EventPriority = EventPriorities.NORMAL,
         eventFilter: EventFilter = EventFilter.ONLY,
     ) {
@@ -41,15 +48,18 @@ class EventBus<T> {
         }
 
         eventContexts.add(eventContext)
+        debugLogger?.logEvent(EventType.SUBSCRIBE, eventClass, eventListener)
     }
 
 
     /**
      * Allows you to unsubscribe any registered listener.
+     * @param eventClass The event type of the listener
      * @param eventListener The listener to unsubscribe
      */
-    fun <E : T> unsubscribe(eventListener: EventListener<E>) {
-        eventContexts.removeIf { it.eventListener == eventListener }
+    fun <E : T> unsubscribe(eventClass: Class<E>, eventListener: EventListener<E>) {
+        eventContexts.removeIf { it.eventType == eventClass && it.eventListener == eventListener }
+        debugLogger?.logEvent(EventType.UNSUBSCRIBE, eventClass, eventListener)
     }
 
 
@@ -58,21 +68,23 @@ class EventBus<T> {
      * @param event The event to trigger.
      */
     fun <E : T> publish(event: E) {
+        val eventClass = event!!::class.java
+
         eventContexts
             .filter {
                 val eventType = it.eventType
                 val eventFilter = it.eventFilter
-                val eventClass = event!!::class.java
 
                 if (eventType.isInterface && eventClass.interfaces.isNotEmpty()) {
                     eventClass.interfaces.any { target -> hasMatch(eventType, target, eventFilter) }
                 } else {
                     hasMatch(eventType, eventClass, eventFilter)
                 }
-
             }
             .forEach {
                 val eventListener = it.eventListener as EventListener<E>
+
+                debugLogger?.logEvent(EventType.PUBLISH, eventClass)
                 eventListener.onEvent(event)
             }
     }
