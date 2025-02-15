@@ -11,6 +11,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '**.kt'
+      - '**.kts'
 
 jobs:
   publish:
