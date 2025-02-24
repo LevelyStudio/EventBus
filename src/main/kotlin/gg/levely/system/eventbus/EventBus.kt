@@ -31,35 +31,35 @@ class EventBus<T>(var enableLogger: Boolean = false) {
 
     /**
      * Register a listener of an event.
-     * @param eventClass the event class to listen to
-     * @param eventListener your listener
+     * @param clazz the event class to listen to
+     * @param listener your listener
      * @return An [EventContext] to manage listening options
      */
     @JvmOverloads
     fun <E : T> subscribe(
-        eventClass: Class<E>,
-        eventListener: EventListener<E>,
-        eventPriority: EventPriority = EventPriorities.NORMAL,
-        eventFilter: EventFilter = EventFilter.ONLY,
+        clazz: Class<E>,
+        listener: EventListener<E>,
+        priority: EventPriority = EventPriorities.NORMAL,
+        filter: EventFilter = EventFilter.ONLY,
     ) {
-        val eventContext = DefaultEventContext(eventClass, eventListener).apply {
-            withEventFilter(eventFilter)
-            withEventPriority(eventPriority)
+        val eventContext = DefaultEventContext(clazz, listener).apply {
+            withEventFilter(filter)
+            withEventPriority(priority)
         }
 
         eventContexts.add(eventContext)
-        debugLogger?.logEvent(EventType.SUBSCRIBE, eventClass, eventListener)
+        debugLogger?.logEvent(EventType.SUBSCRIBE, clazz, listener)
     }
 
 
     /**
      * Allows you to unsubscribe any registered listener.
-     * @param eventClass The event type of the listener
-     * @param eventListener The listener to unsubscribe
+     * @param clazz The event type of the listener
+     * @param listener The listener to unsubscribe
      */
-    fun <E : T> unsubscribe(eventClass: Class<E>, eventListener: EventListener<E>) {
-        eventContexts.removeIf { it.eventType == eventClass && it.eventListener == eventListener }
-        debugLogger?.logEvent(EventType.UNSUBSCRIBE, eventClass, eventListener)
+    fun <E : T> unsubscribe(clazz: Class<E>, listener: EventListener<E>) {
+        eventContexts.removeIf { it.eventType == clazz && it.eventListener == listener }
+        debugLogger?.logEvent(EventType.UNSUBSCRIBE, clazz, listener)
     }
 
 

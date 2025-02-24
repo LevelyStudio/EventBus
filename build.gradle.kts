@@ -5,7 +5,7 @@ plugins {
 
 
 group = "gg.levely"
-version = "1.0.0"
+version = "1.0.1"
 
 
 repositories {
@@ -21,6 +21,13 @@ dependencies {
 
 kotlin {
     jvmToolchain(8)
+}
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 
@@ -41,7 +48,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY")}")
 
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
+                username = System.getenv("GITHUB_USER")
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
