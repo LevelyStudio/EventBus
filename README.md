@@ -132,8 +132,18 @@ eventBus.subscribe(TestEvent::class.java, eventListener, EventPriorities.HIGH)
 You can **filter events** to control how they are handled.
 
 ```kotlin
-eventBus.subscribe(TestEvent::class.java, eventListener, filter = EventFilter.ONLY)
+eventBus.subscribe(TestEvent::class.java, TestListener(), filter = EventFilter.ONLY)
 ```
+
+```kotlin
+class TestListener : EventListener<TestEvent> {
+    override fun onEvent(event: TestEvent) {
+        println(event.test)
+    }
+}
+```
+> **Note**: You can create classes that implement the `EventListener` interface to handle events.
+
 
 ### Available Filters:
 | Filter      | Description |
