@@ -1,11 +1,11 @@
 plugins {
     `maven-publish`
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "1.9.25"
 }
 
 
 group = "gg.levely"
-version = "1.0.1"
+version = "1.0.2"
 
 
 repositories {

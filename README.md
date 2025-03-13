@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation("gg.levely.system:eventbus:1.0.1")
+    implementation("gg.levely.system:eventbus:1.0.2")
 }
 ```
 
@@ -51,7 +51,7 @@ repositories {
 }
 
 dependencies {
-    implementation "gg.levely.system:eventbus:1.0.1"
+    implementation "gg.levely.system:eventbus:1.0.2"
 }
 ```
 
