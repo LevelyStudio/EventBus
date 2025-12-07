@@ -9,4 +9,5 @@ class EventTypeConverter : CompositeConverter<ILoggingEvent>() {
         val eventType = event.mdcPropertyMap["eventType"]
         return eventType ?: value
     }
+
 }

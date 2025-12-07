@@ -6,4 +6,5 @@ enum class EventType {
     PUBLISH_ASYNC,
     SUBSCRIBE,
     UNSUBSCRIBE
+
 }
