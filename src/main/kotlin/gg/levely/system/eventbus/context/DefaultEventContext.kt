@@ -4,13 +4,14 @@ import gg.levely.system.eventbus.EventFilter
 import gg.levely.system.eventbus.EventListener
 import gg.levely.system.eventbus.EventPriorities
 import gg.levely.system.eventbus.EventPriority
+import kotlin.reflect.KClass
 
-class DefaultEventContext<E>(
-    override var eventType: Class<E>,
+class DefaultEventContext<E : Any>(
+    override var eventType: KClass<E>,
     override var eventListener: EventListener<E>
 ) : EventContext<E> {
 
-    override var eventPriority: EventPriority = EventPriorities.Companion.NORMAL
+    override var eventPriority: EventPriority = EventPriorities.NORMAL
     override var eventFilter: EventFilter = EventFilter.ONLY
 
 
