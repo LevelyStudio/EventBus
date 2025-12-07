@@ -5,7 +5,7 @@ plugins {
 
 
 group = "gg.levely"
-version = "1.0.2"
+version = "2.0.0"
 
 
 repositories {
@@ -15,7 +15,8 @@ repositories {
 
 dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("ch.qos.logback:logback-classic:1.3.15")
+    api(kotlin("reflect"))
+    implementation("ch.qos.logback:logback-classic:1.5.21")
 }
 
 
