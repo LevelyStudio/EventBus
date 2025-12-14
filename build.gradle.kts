@@ -16,7 +16,7 @@ repositories {
 dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     api(kotlin("reflect"))
-    implementation("ch.qos.logback:logback-classic:1.5.21")
+    implementation("ch.qos.logback:logback-classic:1.3.15")
 }
 
 
