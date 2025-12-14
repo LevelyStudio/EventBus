@@ -1,7 +1,5 @@
 package gg.levely.system.eventbus
 
-import gg.levely.system.eventbus.context.EventContext
-
 class EventPriority private constructor(val weight: Int) : Comparable<EventPriority> {
 
     companion object {

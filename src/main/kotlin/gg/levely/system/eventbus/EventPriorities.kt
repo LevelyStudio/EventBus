@@ -3,10 +3,14 @@ package gg.levely.system.eventbus
 interface EventPriorities {
 
     companion object {
-        @JvmField val BY_WEIGHT = mutableMapOf<Int, EventPriority>()
-        @JvmField val HIGH = EventPriority.from(3000)
-        @JvmField val NORMAL = EventPriority.from(2000)
-        @JvmField val LOW = EventPriority.from(1000)
+        @JvmField
+        val BY_WEIGHT = mutableMapOf<Int, EventPriority>()
+        @JvmField
+        val HIGH = EventPriority.from(3000)
+        @JvmField
+        val NORMAL = EventPriority.from(2000)
+        @JvmField
+        val LOW = EventPriority.from(1000)
 
 
         init {
@@ -19,6 +23,7 @@ interface EventPriorities {
 
 
         @JvmStatic
-        fun byWeight(weight: Int) = BY_WEIGHT[weight] ?: throw IllegalArgumentException("No priority with weight $weight")
+        fun byWeight(weight: Int) =
+            BY_WEIGHT[weight] ?: throw IllegalArgumentException("No priority with weight $weight")
     }
 }
