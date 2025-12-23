@@ -18,7 +18,7 @@ class EventScope(
         compareByDescending<EventContext<*>> { it.eventPriority.weight }
             .thenBy { it.hashCode() }
     )
-    private val children = ConcurrentHashMap<String?, EventScope>()
+    private val children = ConcurrentHashMap<String, EventScope>()
 
     @Volatile
     var isDisposed: Boolean = false
@@ -71,16 +71,15 @@ class EventScope(
         parent?.children?.values?.remove(this)
     }
 
-    val path: String
-        get() {
-            val parts = mutableListOf<String>()
-            var current: EventScope? = this
-            while (current != null) {
-                current.name?.let { parts.add(0, it) }
-                current = current.parent
-            }
-            return parts.joinToString("/").ifEmpty { "<root>" }
+    fun getPath(): String {
+        val parts = mutableListOf<String>()
+        var current: EventScope? = this
+        while (current != null) {
+            current.name?.let { parts.add(0, it) }
+            current = current.parent
         }
+        return parts.joinToString("/").ifEmpty { "<root>" }
+    }
 
     val subscriptionCount: Int get() = contexts.size
 
