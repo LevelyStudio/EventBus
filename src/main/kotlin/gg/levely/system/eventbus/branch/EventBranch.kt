@@ -1,4 +1,6 @@
-package gg.levely.system.eventbus
+package gg.levely.system.eventbus.branch
+
+import gg.levely.system.eventbus.EventBroker
 
 abstract class EventBranch<T> : EventBroker<T>(), BranchCreator<T>, Detachable {
 
@@ -8,6 +10,6 @@ abstract class EventBranch<T> : EventBroker<T>(), BranchCreator<T>, Detachable {
 
     abstract fun getPath(): String
 
-    abstract fun getStatus(): EventBranchStatus
+    abstract fun getStatus(): BranchStatus
 
 }

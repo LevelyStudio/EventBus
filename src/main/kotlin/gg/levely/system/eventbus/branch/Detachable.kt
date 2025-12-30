@@ -1,4 +1,4 @@
-package gg.levely.system.eventbus
+package gg.levely.system.eventbus.branch
 
 interface Detachable {
 

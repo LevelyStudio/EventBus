@@ -1,4 +1,6 @@
-package gg.levely.system.eventbus
+package gg.levely.system.eventbus.branch
+
+import java.util.UUID
 
 interface BranchCreator<T> {
 
@@ -11,7 +13,7 @@ interface BranchCreator<T> {
 
         @JvmStatic
         fun generateBranchName(): String =
-            "branch-" + System.currentTimeMillis().toString(16) + "-" + (Math.random() * 0x10000).toInt().toString(16)
+            "branch-" + UUID.randomUUID().toString().slice(0..4)
 
     }
 }
