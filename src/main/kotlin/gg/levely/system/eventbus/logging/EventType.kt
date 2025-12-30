@@ -1,4 +1,4 @@
-package gg.levely.system.eventbus.logger
+package gg.levely.system.eventbus.logging
 
 enum class EventType {
 
