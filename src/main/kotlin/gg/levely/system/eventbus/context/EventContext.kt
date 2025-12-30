@@ -7,12 +7,12 @@ import gg.levely.system.eventbus.EventPriority
 interface EventContext<E> {
 
     var eventPriority: EventPriority
-    var eventFilter: EventFilter
+    var eventFilter: EventFilter<E>
     var eventType: Class<E>
     var eventListener: EventListener<E>
 
 
-    fun withEventFilter(eventFilter: EventFilter): EventContext<E>
+    fun withEventFilter(eventFilter: EventFilter<E>): EventContext<E>
 
     fun withEventPriority(eventPriority: EventPriority): EventContext<E>
 

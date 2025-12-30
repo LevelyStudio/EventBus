@@ -1,19 +1,19 @@
 package gg.levely.system.eventbus.context
 
 import gg.levely.system.eventbus.EventFilter
+import gg.levely.system.eventbus.EventFilters
 import gg.levely.system.eventbus.EventListener
-import gg.levely.system.eventbus.EventPriorities
 import gg.levely.system.eventbus.EventPriority
 
-class DefaultEventContext<E>(
+internal class DefaultEventContext<E>(
     override var eventType: Class<E>,
     override var eventListener: EventListener<E>
 ) : EventContext<E> {
 
-    override var eventPriority: EventPriority = EventPriorities.NORMAL
-    override var eventFilter: EventFilter = EventFilter.ONLY
+    override var eventPriority: EventPriority = EventPriority.NORMAL
+    override var eventFilter: EventFilter<E> = EventFilters.exact()
 
-    override fun withEventFilter(eventFilter: EventFilter): EventContext<E> {
+    override fun withEventFilter(eventFilter: EventFilter<E>): EventContext<E> {
         this.eventFilter = eventFilter
         return this
     }
@@ -23,7 +23,4 @@ class DefaultEventContext<E>(
         return this
     }
 
-    override fun toString(): String {
-        return "DefaultEventContext(eventPriority=$eventPriority, eventFilter=$eventFilter, eventType=$eventType, eventListener=$eventListener)"
-    }
 }
