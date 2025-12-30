@@ -1,4 +1,4 @@
-package gg.levely.system.eventbus
+package gg.levely.system.eventbus.filter
 
 import java.util.function.Predicate
 
