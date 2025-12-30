@@ -1,14 +1,16 @@
 package gg.levely.system.eventbus
 
-import gg.levely.system.eventbus.context.EventContext
+import gg.levely.system.eventbus.internal.EventContext
+import gg.levely.system.eventbus.filter.EventFilter
+import gg.levely.system.eventbus.filter.EventFilters
 
 abstract class EventBroker<T> {
 
     abstract fun <E : T> subscribe(
         eventType: Class<E>,
         listener: EventListener<E>,
-        eventPriority: EventPriority,
-        eventFilter: EventFilter<E>
+        priority: EventPriority,
+        filter: EventFilter<E>
     ): EventContext<E>
 
     fun <E : T> subscribe(eventType: Class<E>, listener: EventListener<E>): EventContext<E> {
