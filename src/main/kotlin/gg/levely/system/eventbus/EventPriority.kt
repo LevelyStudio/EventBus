@@ -14,11 +14,16 @@ class EventPriority(
 
     companion object {
 
-        @JvmField val LOWEST = of("LOWEST", -1000)
-        @JvmField val LOW = of("LOW", -500)
-        @JvmField val NORMAL = of("NORMAL", 0)
-        @JvmField val HIGH = of("HIGH", 500)
-        @JvmField val HIGHEST = of("HIGHEST", 1000)
+        @JvmField
+        val LOWEST = of("LOWEST", -1000)
+        @JvmField
+        val LOW = of("LOW", -500)
+        @JvmField
+        val NORMAL = of("NORMAL", 0)
+        @JvmField
+        val HIGH = of("HIGH", 500)
+        @JvmField
+        val HIGHEST = of("HIGHEST", 1000)
 
         @JvmStatic
         @JvmOverloads

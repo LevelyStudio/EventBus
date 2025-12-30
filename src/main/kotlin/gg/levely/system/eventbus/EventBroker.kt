@@ -15,7 +15,7 @@ abstract class EventBroker<T> {
         return subscribe(eventType, listener, EventPriority.NORMAL, EventFilters.exact())
     }
 
-    fun <E : T> subscribe(eventType: Class<E>, listener: EventListener<E>, priority: EventPriority) : EventContext<E> {
+    fun <E : T> subscribe(eventType: Class<E>, listener: EventListener<E>, priority: EventPriority): EventContext<E> {
         return subscribe(eventType, listener, priority, EventFilters.exact())
     }
 

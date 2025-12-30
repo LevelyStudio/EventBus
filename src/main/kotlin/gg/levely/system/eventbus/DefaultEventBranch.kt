@@ -27,7 +27,7 @@ internal class DefaultEventBranch<T>(
         listener: EventListener<E>,
         eventPriority: EventPriority,
         eventFilter: EventFilter<E>
-    ) : EventContext<E> {
+    ): EventContext<E> {
         val context = root.subscribe(eventType, listener, eventPriority, eventFilter)
         contexts.add(context)
         return context
