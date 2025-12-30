@@ -19,9 +19,7 @@ mechanisms** to help manage event-driven architectures efficiently.
 
 ## 📦 Installation
 
-This library is available on *
-*[GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)
-**.
+This library is available on **[GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)**.
 
 ### 🛠️ Gradle (Kotlin DSL)
 
