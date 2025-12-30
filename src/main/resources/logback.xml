@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <conversionRule conversionWord="eventLevel" converterClass="gg.levely.system.eventbus.logger.EventTypeConverter"/>
+    <conversionRule conversionWord="eventLevel" converterClass="gg.levely.system.eventbus.logging.EventTypeConverter"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
