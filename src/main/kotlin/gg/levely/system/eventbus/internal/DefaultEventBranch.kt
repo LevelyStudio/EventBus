@@ -1,6 +1,11 @@
-package gg.levely.system.eventbus
+package gg.levely.system.eventbus.internal
 
-import gg.levely.system.eventbus.context.EventContext
+import gg.levely.system.eventbus.branch.EventBranch
+import gg.levely.system.eventbus.branch.BranchStatus
+import gg.levely.system.eventbus.EventBus
+import gg.levely.system.eventbus.EventListener
+import gg.levely.system.eventbus.EventPriority
+import gg.levely.system.eventbus.filter.EventFilter
 
 internal class DefaultEventBranch<T>(
     private val name: String,
@@ -10,7 +15,7 @@ internal class DefaultEventBranch<T>(
 
     private val children = mutableListOf<EventBranch<T>>()
     private val contexts = mutableListOf<EventContext<*>>()
-    private var status: EventBranchStatus = EventBranchStatus.ATTACHED
+    private var status: BranchStatus = BranchStatus.ATTACHED
 
     override fun getName(): String = name
 
@@ -20,15 +25,15 @@ internal class DefaultEventBranch<T>(
         return parent?.let { "${it.getPath()}/$name" } ?: name
     }
 
-    override fun getStatus(): EventBranchStatus = status
+    override fun getStatus(): BranchStatus = status
 
     override fun <E : T> subscribe(
         eventType: Class<E>,
         listener: EventListener<E>,
-        eventPriority: EventPriority,
-        eventFilter: EventFilter<E>
+        priority: EventPriority,
+        filter: EventFilter<E>
     ): EventContext<E> {
-        val context = root.subscribe(eventType, listener, eventPriority, eventFilter)
+        val context = root.subscribe(eventType, listener, priority, filter)
         contexts.add(context)
         return context
     }
@@ -44,8 +49,8 @@ internal class DefaultEventBranch<T>(
     }
 
     override fun detach() {
-        if (status == EventBranchStatus.DETACHED) return
-        status = EventBranchStatus.DETACHED
+        if (status == BranchStatus.DETACHED) return
+        status = BranchStatus.DETACHED
 
         contexts.forEach { context ->
             root.unsubscribe(context as EventContext<Any>)
@@ -58,8 +63,8 @@ internal class DefaultEventBranch<T>(
     }
 
     override fun reattach() {
-        if (status == EventBranchStatus.ATTACHED) return
-        status = EventBranchStatus.ATTACHED
+        if (status == BranchStatus.ATTACHED) return
+        status = BranchStatus.ATTACHED
 
         contexts.forEach { context ->
             root.subscribe(context as EventContext<Any>)
