@@ -57,7 +57,7 @@ internal class DefaultEventBranch<T>(
 
     }
 
-    override fun attach() {
+    override fun reattach() {
         if (status == EventBranchStatus.ATTACHED) return
         status = EventBranchStatus.ATTACHED
 
