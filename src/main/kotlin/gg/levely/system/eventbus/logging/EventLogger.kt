@@ -13,7 +13,7 @@ class EventLogger(name: String = "EventBus") {
     fun <E> logEvent(eventType: EventType, event: Class<E>, eventListener: Any? = null) {
         logEventType(eventType) {
             when (eventType) {
-                EventType.PUBLISH, EventType.PUBLISH_ASYNC -> logger.info("Event: {}", event.simpleName)
+                EventType.PUBLISH -> logger.info("Event: {}", event.simpleName)
                 EventType.SUBSCRIBE, EventType.UNSUBSCRIBE -> {
                     eventListener?.let {
                         logger.info(
