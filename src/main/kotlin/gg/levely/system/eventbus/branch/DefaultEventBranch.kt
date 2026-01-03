@@ -1,11 +1,10 @@
-package gg.levely.system.eventbus.internal
+package gg.levely.system.eventbus.branch
 
-import gg.levely.system.eventbus.branch.EventBranch
-import gg.levely.system.eventbus.branch.BranchStatus
 import gg.levely.system.eventbus.EventBus
 import gg.levely.system.eventbus.EventListener
 import gg.levely.system.eventbus.EventPriority
 import gg.levely.system.eventbus.filter.EventFilter
+import gg.levely.system.eventbus.EventContext
 
 internal class DefaultEventBranch<T>(
     private val name: String,

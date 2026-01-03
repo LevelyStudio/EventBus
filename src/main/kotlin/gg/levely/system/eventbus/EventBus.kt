@@ -2,9 +2,9 @@ package gg.levely.system.eventbus
 
 import gg.levely.system.eventbus.branch.BranchCreator
 import gg.levely.system.eventbus.branch.EventBranch
-import gg.levely.system.eventbus.internal.EventContext
+import gg.levely.system.eventbus.EventContext
 import gg.levely.system.eventbus.filter.EventFilter
-import gg.levely.system.eventbus.internal.DefaultEventBranch
+import gg.levely.system.eventbus.branch.DefaultEventBranch
 import gg.levely.system.eventbus.logging.EventLogger
 import gg.levely.system.eventbus.logging.EventType
 import java.util.concurrent.ConcurrentSkipListSet

@@ -1,6 +1,6 @@
 package gg.levely.system.eventbus
 
-import gg.levely.system.eventbus.internal.EventContext
+import gg.levely.system.eventbus.EventContext
 import gg.levely.system.eventbus.filter.EventFilter
 import gg.levely.system.eventbus.filter.EventFilters
 
