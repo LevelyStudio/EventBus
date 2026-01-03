@@ -1,128 +1,144 @@
 package gg.levely.system.eventbus
 
-import gg.levely.system.eventbus.logger.DebugLogger
-import gg.levely.system.eventbus.context.DefaultEventContext
-import gg.levely.system.eventbus.context.EventContext
-import gg.levely.system.eventbus.logger.EventType
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
-import java.util.*
-import java.util.concurrent.PriorityBlockingQueue
+import gg.levely.system.eventbus.branch.BranchCreator
+import gg.levely.system.eventbus.branch.EventBranch
+import gg.levely.system.eventbus.EventContext
+import gg.levely.system.eventbus.filter.EventFilter
+import gg.levely.system.eventbus.branch.DefaultEventBranch
+import gg.levely.system.eventbus.logging.EventLogger
+import gg.levely.system.eventbus.logging.EventType
+import java.util.concurrent.ConcurrentSkipListSet
 
 /**
- * The event bus manages listeners and allows you to trigger your own events.
- * @see [subscribe] to register a listener.
- * @see [publish] to trigger an event.
- * @author Luke and Oleksandr
+ * Event bus that manages listeners and allows triggering custom events.
+ *
+ * @param T The base event type
+ * @param enableLogger Enable debug logging for event operations
  */
-class EventBus<T>(var enableLogger: Boolean = false) {
-
-    @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    private val eventDispatcher = newSingleThreadContext("Event-Dispatcher")
-    private val eventContexts: Queue<EventContext<*>> = PriorityBlockingQueue<EventContext<*>>(1, EventComparator())
-
-    private val logger = DebugLogger()
-    private val debugLogger: DebugLogger?
-        get() = if (enableLogger) logger else null
-
+class EventBus<T>(
+    private val enableLogger: Boolean = false
+) : BranchCreator<T>, EventBroker<T>() {
 
     /**
-     * Register a listener of an event.
-     * @param clazz the event class to listen to
-     * @param listener your listener
-     * @return An [EventContext] to manage listening options
+     * The set of registered event contexts.
      */
-    @JvmOverloads
-    fun <E : T> subscribe(
-        clazz: Class<E>,
-        listener: EventListener<E>,
-        priority: EventPriority = EventPriorities.NORMAL,
-        filter: EventFilter = EventFilter.ONLY,
-    ) {
-        val eventContext = DefaultEventContext(clazz, listener).apply {
-            withEventFilter(filter)
-            withEventPriority(priority)
-        }
+    private val eventContexts = ConcurrentSkipListSet(
+        compareByDescending<EventContext<*>> { it.priority.weight }
+            .thenBy { it.hashCode() }
+    )
 
-        eventContexts.add(eventContext)
-        debugLogger?.logEvent(EventType.SUBSCRIBE, clazz, listener)
+    private val children = mutableListOf<EventBranch<T>>()
+
+    /**
+     * The debug logger instance.
+     */
+    private val logger by lazy { EventLogger() }
+
+    /**
+     * Subscribes to an event of type [E].
+     *
+     * @param E The event type
+     * @param eventType The class of the event type
+     * @param listener The event listener
+     * @param priority The priority of the event listener
+     * @param filter The filter for the event listener
+     */
+    override fun <E : T> subscribe(
+        eventType: Class<E>,
+        listener: EventListener<E>,
+        priority: EventPriority,
+        filter: EventFilter<E>
+    ): EventContext<E> {
+        val context = EventContext(
+            eventType,
+            listener,
+            priority,
+            filter
+        )
+        eventContexts.add(context)
+        if (enableLogger) {
+            logger.logEvent(EventType.SUBSCRIBE, eventType, listener)
+        }
+        return context
     }
 
+    internal fun subscribe(context: EventContext<Any>) {
+        eventContexts.add(context)
+        if (enableLogger) {
+            logger.logEvent(EventType.SUBSCRIBE, context.eventType, context.listener)
+        }
+    }
 
     /**
-     * Allows you to unsubscribe any registered listener.
-     * @param clazz The event type of the listener
-     * @param listener The listener to unsubscribe
+     * Unsubscribes from an event of type [E].
+     *
+     * @param E The event type
+     * @param listener The event listener
+     */
+    inline fun <reified E : T> unsubscribe(listener: EventListener<E>) {
+        unsubscribe(E::class.java, listener)
+    }
+
+    /**
+     * Unsubscribes from an event of type [E].
+     *
+     * @param E The event type
+     * @param clazz The class of the event type
+     * @param listener The event listener
      */
     fun <E : T> unsubscribe(clazz: Class<E>, listener: EventListener<E>) {
-        eventContexts.removeIf { it.eventType == clazz && it.eventListener == listener }
-        debugLogger?.logEvent(EventType.UNSUBSCRIBE, clazz, listener)
+        eventContexts.removeIf { it.eventType == clazz && it.listener == listener }
+        if (enableLogger) {
+            logger.logEvent(EventType.UNSUBSCRIBE, clazz, listener)
+        }
     }
 
+    /**
+     * Unsubscribes using the provided event context.
+     *
+     * @param context The event context to unsubscribe
+     */
+    fun unsubscribe(context: EventContext<Any>) {
+        eventContexts.remove(context)
+        if (enableLogger) {
+            logger.logEvent(EventType.UNSUBSCRIBE, context.eventType, context.listener)
+        }
+    }
 
     /**
-     * Pass an instance of an event to trigger all subscribed listeners.
-     * @param event The event to trigger.
+     * Publishes an event to all matching listeners.
+     *
+     * @param E The event type
+     * @param event The event to publish
+     * @return The published event
      */
-    fun <E : T> publish(event: E) {
+    override fun <E : T> publish(event: E): E {
         val eventClass = event!!::class.java
 
         eventContexts
-            .filter {
-                val eventType = it.eventType
-                val eventFilter = it.eventFilter
+            .asSequence()
+            .filter { ctx ->
+                val normalizedEventFilter = ctx.filter as EventFilter<Any>
+                normalizedEventFilter.test(event, ctx.eventType as Class<Any>)
+            }
+            .forEach { ctx ->
+                @Suppress("UNCHECKED_CAST")
+                val listener = ctx.listener as EventListener<E>
 
-                if (eventType.isInterface && eventClass.interfaces.isNotEmpty()) {
-                    eventClass.interfaces.any { target -> hasMatch(eventType, target, eventFilter) }
-                } else {
-                    hasMatch(eventType, eventClass, eventFilter)
+                if (enableLogger) {
+                    logger.logEvent(EventType.PUBLISH, eventClass)
                 }
+
+                listener.onEvent(event)
             }
-            .forEach {
-                val eventListener = it.eventListener as EventListener<E>
 
-                debugLogger?.logEvent(EventType.PUBLISH, eventClass)
-                eventListener.onEvent(event)
-            }
+        return event
     }
 
-
-    /**
-     * Do the same as [publish] but asynchronously.
-     */
-    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
-    fun <E : T> publishAsync(event: E) {
-        GlobalScope.launch(eventDispatcher) {
-            publish(event)
-        }
+    override fun branch(name: String): EventBranch<T> {
+        val childBranch = DefaultEventBranch(name, this, null)
+        children.add(childBranch)
+        return childBranch
     }
 
-
-    fun <E : T> getEventContexts(eventType: Class<E>, eventFilter: EventFilter): List<EventContext<T>> {
-        return eventContexts.filter { hasMatch(it.eventType, eventType, eventFilter) }.toList() as List<EventContext<T>>
-    }
-
-
-    /**
-     * Check whether from and to are equals or if from is a subtype of to<br>
-     * depending on the eventFilter.
-     * @param from The event's class
-     * @param to The event's class or any sub interface of it
-     * @param eventFilter The event's filter
-     */
-    private fun hasMatch(from: Class<*>, to: Class<*>, eventFilter: EventFilter): Boolean {
-        return if (eventFilter === EventFilter.ONLY) from == to else from.isAssignableFrom(to)
-    }
-
-
-    /**
-     * A comparator to sort listeners by priority.
-     */
-    class EventComparator : Comparator<EventContext<*>> {
-
-        override fun compare(o1: EventContext<*>, o2: EventContext<*>) = o1.eventPriority.weight - o2.eventPriority.weight
-    }
 }

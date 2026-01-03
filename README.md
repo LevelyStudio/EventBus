@@ -1,15 +1,19 @@
 # 🎉 EventBus - Lightweight Event System in Kotlin
 
-**EventBus** is a **lightweight**, **flexible**, and **high-performance** event system built in **Kotlin**. It provides **synchronous and asynchronous event handling**, **priority-based event dispatching**, and **powerful filtering mechanisms** to help manage event-driven architectures efficiently.
+**EventBus** is a **lightweight**, **flexible**, and **high-performance** event system built in **Kotlin**. It provides
+**synchronous event handling**, **priority-based event dispatching**, **powerful filtering mechanisms**, and **dynamic event branches**
+to help manage event-driven architectures efficiently.
 
 ---
 
 ## 🚀 Features
 
-✔ **Register & Unregister Listeners**  
-✔ **Synchronous & Asynchronous Event Dispatching**  
-✔ **Event Priority Management**  
-✔ **Advanced Event Filtering** (`ONLY`, `DERIVE`)  
+✔ **Synchronous Event Dispatching**  
+✔ **Thread-Safe Event Handling** (using ConcurrentSkipListSet)  
+✔ **Priority-Based Listener Execution**  
+✔ **Advanced Event Filtering** (`exact()`, `hierarchy()`, custom filters with logical operators)  
+✔ **Event Branches** (Detachable/Reattachable listener groups with hierarchy support)  
+✔ **Lambda & Reified Type Support** for concise event subscription  
 ✔ **Integrated Logging System (SLF4J)**  
 ✔ **Debug Mode for Event Tracking**
 
@@ -33,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation("gg.levely.system:eventbus:1.0.2")
+    implementation("gg.levely.system:eventbus:2.0.0")
 }
 ```
 
@@ -51,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    implementation "gg.levely.system:eventbus:1.0.2"
+    implementation "gg.levely.system:eventbus:2.0.0"
 }
 ```
 
@@ -62,12 +66,14 @@ dependencies {
 GitHub Packages requires authentication. Set up your credentials in `gradle.properties` or as environment variables.
 
 #### **Option 1: Add to `gradle.properties`**
+
 ```properties
 gpr.user=your-github-username
 gpr.token=your-personal-access-token
 ```
 
 #### **Option 2: Use Environment Variables**
+
 ```sh
 export GITHUB_USER=your-github-username
 export GITHUB_TOKEN=your-personal-access-token
@@ -80,76 +86,202 @@ export GITHUB_TOKEN=your-personal-access-token
 ## 🚀 Getting Started
 
 ### 1️⃣ **Define an Event Interface**
+
 ```kotlin
-interface EventExample
+interface GameEvent
 ```
 
-### 2️⃣ **Create an Event**
+### 2️⃣ **Create Event Classes**
+
 ```kotlin
-class TestEvent : EventExample {
-    val test = "Hello, EventBus!"
-}
+data class Player(val name: String, val balance: Double)
+data class PlayerJoinEvent(val player: Player) : GameEvent
+data class PlayerLeaveEvent(val player: Player) : GameEvent
 ```
 
 ### 3️⃣ **Create an Event Bus**
+
 ```kotlin
-val eventBus = EventBus<EventExample>()
+val eventBus = EventBus<GameEvent>()
 ```
 
 ### 4️⃣ **Register a Listener**
+
+Using lambda syntax with reified type:
+
 ```kotlin
-eventBus.subscribe(TestEvent::class.java) { event ->
-    println(event.test) // Access event data
+eventBus.subscribe<PlayerJoinEvent> { event ->
+    println("Player joined: ${event.player.name}")
+}
+```
+
+Or using the traditional class-based approach:
+
+```kotlin
+eventBus.subscribe(PlayerJoinEvent::class.java) { event ->
+    println("Player joined: ${event.player.name}")
 }
 ```
 
 ### 5️⃣ **Publish an Event**
+
 ```kotlin
-eventBus.publish(TestEvent())
+val player = Player("Alice", 2000.0)
+eventBus.publish(PlayerJoinEvent(player))
 ```
 
 ---
 
 ## 🎯 Event Priorities
 
-Events can be assigned a **priority** to control execution order.
+Events can be assigned a **priority** to control execution order. Higher priority listeners execute first.
 
 ```kotlin
-eventBus.subscribe(TestEvent::class.java, eventListener, EventPriorities.HIGH)
+eventBus.subscribe<PlayerJoinEvent>(priority = EventPriority.HIGHEST) { event ->
+    println("High priority handler: ${event.player.name}")
+}
+
+eventBus.subscribe<PlayerJoinEvent>(priority = EventPriority.LOW) { event ->
+    println("Low priority handler: ${event.player.name}")
+}
 ```
 
 ### Available Priorities:
-| Priority | Description |
-|----------|------------|
-| `HIGH`   | Executed first |
-| `NORMAL` | Default priority |
-| `LOW`    | Executed last |
+
+| Priority  | Weight | Description         |
+|-----------|--------|---------------------|
+| `HIGHEST` | 1000   | Executed first      |
+| `HIGH`    | 500    | High priority       |
+| `NORMAL`  | 0      | Default priority    |
+| `LOW`     | -500   | Low priority        |
+| `LOWEST`  | -1000  | Executed last       |
+
+### Custom Priorities:
+
+You can create custom priorities with specific weights:
+
+```kotlin
+val customPriority = EventPriority.of("CRITICAL", 2000)
+val beforeNormal = EventPriority.before(EventPriority.NORMAL, gap = 10)
+val afterHigh = EventPriority.after(EventPriority.HIGH, gap = 5)
+```
 
 ---
 
 ## 🎭 Event Filtering
 
-You can **filter events** to control how they are handled.
+You can **filter events** to control how they are handled using **EventFilters**.
+
+### Using Lambda Filters:
 
 ```kotlin
-eventBus.subscribe(TestEvent::class.java, TestListener(), filter = EventFilter.ONLY)
+eventBus.subscribe<PlayerJoinEvent> { event ->
+    println("Player joined: ${event.player.name}")
+}
 ```
 
+### Advanced Filtering with Custom Conditions:
+
 ```kotlin
-class TestListener : EventListener<TestEvent> {
-    override fun onEvent(event: TestEvent) {
-        println(event.test)
+interface TransactionEvent : GameEvent
+
+data class ProcessTransactionEvent(
+    val source: Player,
+    val target: Player,
+    val amount: Double
+) : TransactionEvent
+
+// Filter high-value transactions
+val filterHighTransaction = EventFilters.exact<ProcessTransactionEvent>() and EventFilters.filter { event ->
+    event.amount > 1_000_000.0
+}
+
+eventBus.subscribe<ProcessTransactionEvent>(filter = filterHighTransaction) { event ->
+    println("Processing high-value transaction of ${event.amount}")
+}
+```
+
+### Available Filter Methods:
+
+| Filter Method | Description                                          |
+|---------------|------------------------------------------------------|
+| `exact()`     | Matches only the exact event type                    |
+| `hierarchy()` | Matches the event type and its subclasses            |
+| `filter()`    | Custom filter with a predicate                       |
+| `all()`       | Matches all events                                   |
+| `none()`      | Matches no events                                    |
+
+### Combining Filters:
+
+You can combine filters using logical operators:
+
+```kotlin
+val complexFilter = EventFilters.exact<ProcessTransactionEvent>() and EventFilters.filter { event ->
+    event.amount > 500.0
+}
+
+val orFilter = filter1 or filter2
+val notFilter = !someFilter
+```
+
+---
+
+## 🌿 Event Branches
+
+**Event Branches** allow you to create isolated groups of event listeners that can be **attached** or **detached** dynamically. This is useful for managing temporary event handlers or modular event systems.
+
+### Creating a Branch:
+
+```kotlin
+val customBranch = eventBus.branch() {
+    subscribe<PlayerJoinEvent> { event ->
+        println("Player joined: ${event.player}")
     }
 }
 ```
-> **Note**: You can create classes that implement the `EventListener` interface to handle events.
 
+### Branch Operations:
 
-### Available Filters:
-| Filter      | Description |
-|------------|-------------|
-| `ONLY`     | Listens only to the exact event type |
-| `DERIVE`   | Listens to the event and its subclasses |
+```kotlin
+// Get the branch path
+println("Path: ${customBranch.getPath()}")
+
+// Detach the branch (temporarily disable all its listeners)
+customBranch.detach()
+
+// Events published while detached won't be handled by this branch
+eventBus.publish(PlayerJoinEvent(player))
+
+// Reattach the branch (re-enable all its listeners)
+customBranch.reattach()
+
+// Now events will be handled again
+eventBus.publish(PlayerJoinEvent(player))
+```
+
+### Named Branches:
+
+```kotlin
+val namedBranch = eventBus.branch("my-custom-branch") {
+    subscribe<PlayerLeaveEvent> { event ->
+        println("Player left: ${event.player.name}")
+    }
+}
+```
+
+### Branch Hierarchy:
+
+Branches can have child branches, creating a tree structure:
+
+```kotlin
+val parentBranch = eventBus.branch("parent")
+val childBranch = parentBranch.branch("child")
+
+// Get hierarchical path: "parent/child"
+println(childBranch.getPath())
+```
+
+> **Note**: When a parent branch is detached, all its children are also detached.
 
 ---
 
@@ -158,23 +290,32 @@ class TestListener : EventListener<TestEvent> {
 **EventBus** includes a built-in **debug mode** that logs event activities such as publishing and subscribing.
 
 ### 🔍 **Enable Debug Mode**
-You can enable debug logging by setting the `enableLogger` variable to `true` when you want to track events.
+
+You can enable debug logging by passing `enableLogger = true` to the EventBus constructor:
 
 ```kotlin
-eventBus.enableLogger = true
+val eventBus = EventBus<GameEvent>(enableLogger = true)
 ```
 
 ### 🔥 **Logging Events**
+
 When debug mode is enabled, EventBus logs every **event registration, dispatch, and unsubscription**.
 
 Example:
+
 ```kotlin
-eventBus.publish(TestEvent())  // Will be logged if enableLogger = true
+val eventBus = EventBus<GameEvent>(enableLogger = true)
+
+eventBus.subscribe<PlayerJoinEvent> { event ->
+    println("Player joined: ${event.player.name}")
+}
+
+eventBus.publish(PlayerJoinEvent(Player("Alice", 2000.0)))  // Will be logged
 ```
 
 ### 📌 **Logged Event Types**
+
 - `PUBLISH`
-- `PUBLISH_ASYNC`
 - `SUBSCRIBE`
 - `UNSUBSCRIBE`
 
