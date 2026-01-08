@@ -1,7 +1,8 @@
 # 🎉 EventBus - Lightweight Event System in Kotlin
 
 **EventBus** is a **lightweight**, **flexible**, and **high-performance** event system built in **Kotlin**. It provides
-**synchronous event handling**, **priority-based event dispatching**, **powerful filtering mechanisms**, and **dynamic event branches**
+**synchronous event handling**, **priority-based event dispatching**, **powerful filtering mechanisms**, and **dynamic
+event branches**
 to help manage event-driven architectures efficiently.
 
 ---
@@ -21,7 +22,9 @@ to help manage event-driven architectures efficiently.
 
 ## 📦 Installation
 
-This library is available on **[GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)**.
+This library is available on *
+*[GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)
+**.
 
 ### 🛠️ Gradle (Kotlin DSL)
 
@@ -37,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    implementation("gg.levely.system:eventbus:2.0.0")
+    implementation("gg.levely.system:eventbus:2.1.0")
 }
 ```
 
@@ -55,7 +58,7 @@ repositories {
 }
 
 dependencies {
-    implementation "gg.levely.system:eventbus:2.0.0"
+    implementation "gg.levely.system:eventbus:2.1.0"
 }
 ```
 
@@ -148,13 +151,13 @@ eventBus.subscribe<PlayerJoinEvent>(priority = EventPriority.LOW) { event ->
 
 ### Available Priorities:
 
-| Priority  | Weight | Description         |
-|-----------|--------|---------------------|
-| `HIGHEST` | 1000   | Executed first      |
-| `HIGH`    | 500    | High priority       |
-| `NORMAL`  | 0      | Default priority    |
-| `LOW`     | -500   | Low priority        |
-| `LOWEST`  | -1000  | Executed last       |
+| Priority  | Weight | Description      |
+|-----------|--------|------------------|
+| `HIGHEST` | 1000   | Executed first   |
+| `HIGH`    | 500    | High priority    |
+| `NORMAL`  | 0      | Default priority |
+| `LOW`     | -500   | Low priority     |
+| `LOWEST`  | -1000  | Executed last    |
 
 ### Custom Priorities:
 
@@ -203,13 +206,13 @@ eventBus.subscribe<ProcessTransactionEvent>(filter = filterHighTransaction) { ev
 
 ### Available Filter Methods:
 
-| Filter Method | Description                                          |
-|---------------|------------------------------------------------------|
-| `exact()`     | Matches only the exact event type                    |
-| `hierarchy()` | Matches the event type and its subclasses            |
-| `filter()`    | Custom filter with a predicate                       |
-| `all()`       | Matches all events                                   |
-| `none()`      | Matches no events                                    |
+| Filter Method | Description                               |
+|---------------|-------------------------------------------|
+| `exact()`     | Matches only the exact event type         |
+| `hierarchy()` | Matches the event type and its subclasses |
+| `filter()`    | Custom filter with a predicate            |
+| `all()`       | Matches all events                        |
+| `none()`      | Matches no events                         |
 
 ### Combining Filters:
 
@@ -228,7 +231,8 @@ val notFilter = !someFilter
 
 ## 🌿 Event Branches
 
-**Event Branches** allow you to create isolated groups of event listeners that can be **attached** or **detached** dynamically. This is useful for managing temporary event handlers or modular event systems.
+**Event Branches** allow you to create isolated groups of event listeners that can be **attached** or **detached**
+dynamically. This is useful for managing temporary event handlers or modular event systems.
 
 ### Creating a Branch:
 
@@ -291,10 +295,11 @@ println(childBranch.getPath())
 
 ### 🔍 **Enable Debug Mode**
 
-You can enable debug logging by passing `enableLogger = true` to the EventBus constructor:
+You can enable debug logging by calling:
 
 ```kotlin
-val eventBus = EventBus<GameEvent>(enableLogger = true)
+val eventBus = EventBus<GameEvent>()
+eventBus.enableDebugLogger()
 ```
 
 ### 🔥 **Logging Events**
@@ -304,11 +309,13 @@ When debug mode is enabled, EventBus logs every **event registration, dispatch, 
 Example:
 
 ```kotlin
-val eventBus = EventBus<GameEvent>(enableLogger = true)
+val eventBus = EventBus<GameEvent>()
+eventBus.enableDebugLogger()
 
 eventBus.subscribe<PlayerJoinEvent> { event ->
     println("Player joined: ${event.player.name}")
 }
+// Will be logged
 
 eventBus.publish(PlayerJoinEvent(Player("Alice", 2000.0)))  // Will be logged
 ```
@@ -319,7 +326,8 @@ eventBus.publish(PlayerJoinEvent(Player("Alice", 2000.0)))  // Will be logged
 - `SUBSCRIBE`
 - `UNSUBSCRIBE`
 
-> **Note:** EventBus uses **SLF4J** for logging, so ensure you have an **SLF4J implementation** (e.g., **Logback** or **Log4j**).
+> **Note:** EventBus uses **SLF4J** for logging, so ensure you have an **SLF4J implementation** (e.g., **Logback** or *
+*Log4j**).
 
 ---
 
