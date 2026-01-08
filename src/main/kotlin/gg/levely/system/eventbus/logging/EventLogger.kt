@@ -1,46 +1,32 @@
 package gg.levely.system.eventbus.logging
 
-import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.pattern.CompositeConverter
+import gg.levely.system.eventbus.EventBus
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 
-class EventLogger(name: String = "EventBus") {
+class EventLogger {
 
-    private val logger = LoggerFactory.getLogger(name)
-
+    private val logger = LoggerFactory.getLogger(EventBus::class.java)
 
     fun <E> logEvent(eventType: EventType, event: Class<E>, eventListener: Any? = null) {
-        logEventType(eventType) {
-            when (eventType) {
-                EventType.PUBLISH -> logger.info("Event: {}", event.simpleName)
-                EventType.SUBSCRIBE, EventType.UNSUBSCRIBE -> {
-                    eventListener?.let {
-                        logger.info(
-                            "Event: {}, Listener: {}",
-                            it.javaClass.simpleName,
-                            event.simpleName
-                        )
-                    }
+        when (eventType) {
+            EventType.PUBLISH ->
+                logger.debug("[{}] Event: {}", eventType, event.simpleName)
+
+            EventType.SUBSCRIBE, EventType.UNSUBSCRIBE -> {
+                eventListener?.let {
+                    logger.debug(
+                        "[{}] Listener: {} -> Event: {}",
+                        eventType,
+                        it.javaClass.simpleName,
+                        event.simpleName
+                    )
                 }
             }
         }
     }
 
-
-    private fun logEventType(eventType: EventType, loggerAction: () -> Unit) {
-        MDC.put("eventType", eventType.name)
-        loggerAction.invoke()
-        MDC.clear()
-    }
-
-}
-
-class EventTypeConverter : CompositeConverter<ILoggingEvent>() {
-
-    override fun transform(event: ILoggingEvent, value: String): String {
-        val eventType = event.mdcPropertyMap["eventType"]
-        return eventType ?: value
+    fun isDebugEnabled(): Boolean {
+        return logger.isDebugEnabled
     }
 
 }

@@ -1,8 +1,10 @@
 package gg.levely.system.eventbus
 
-import gg.levely.system.eventbus.EventContext
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import gg.levely.system.eventbus.filter.EventFilter
 import gg.levely.system.eventbus.filter.EventFilters
+import org.slf4j.LoggerFactory
 
 abstract class EventBroker<T> {
 
@@ -35,5 +37,18 @@ abstract class EventBroker<T> {
 
     abstract fun <E : T> publish(event: E): E
 
+    fun enableDebugLogging() {
+        val logger = LoggerFactory.getLogger(EventBus::class.java)
+        if (logger is Logger) {
+            logger.level = Level.DEBUG
+        }
+    }
+
+    fun disableDebugLogging() {
+        val logger = LoggerFactory.getLogger(EventBus::class.java)
+        if (logger is Logger) {
+            logger.level = Level.INFO
+        }
+    }
 }
 
