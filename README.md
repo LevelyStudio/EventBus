@@ -5,7 +5,6 @@
 event branches**
 to help manage event-driven architectures efficiently.
 
----
 
 ## 🚀 Features
 
@@ -18,7 +17,6 @@ to help manage event-driven architectures efficiently.
 ✔ **Integrated Logging System (SLF4J)**  
 ✔ **Debug Mode for Event Tracking**
 
----
 
 ## 📦 Installation
 
@@ -60,7 +58,6 @@ dependencies {
 }
 ```
 
----
 
 ## 🔑 Authentication
 
@@ -82,7 +79,6 @@ export GITHUB_TOKEN=your-personal-access-token
 
 > **Note:** The GitHub token must have `read:packages` permission.
 
----
 
 ## 🚀 Getting Started
 
@@ -131,7 +127,6 @@ val player = Player("Alice", 2000.0)
 eventBus.publish(PlayerJoinEvent(player))
 ```
 
----
 
 ## 🎯 Event Priorities
 
@@ -166,8 +161,6 @@ val customPriority = EventPriority.of("CRITICAL", 2000)
 val beforeNormal = EventPriority.before(EventPriority.NORMAL, gap = 10)
 val afterHigh = EventPriority.after(EventPriority.HIGH, gap = 5)
 ```
-
----
 
 ## 🎭 Event Filtering
 
@@ -225,7 +218,6 @@ val orFilter = filter1 or filter2
 val notFilter = !someFilter
 ```
 
----
 
 ## 🌿 Event Branches
 
@@ -285,7 +277,6 @@ println(childBranch.getPath())
 
 > **Note**: When a parent branch is detached, all its children are also detached.
 
----
 
 ## 📊 Debug Mode & Logging
 
@@ -327,7 +318,6 @@ eventBus.publish(PlayerJoinEvent(Player("Alice", 2000.0)))  // Will be logged
 > **Note:** EventBus uses **SLF4J** for logging, so ensure you have an **SLF4J implementation** (e.g., **Logback** or *
 *Log4j**).
 
----
 
 ## 🙌 Credits
 
