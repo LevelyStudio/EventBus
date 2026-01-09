@@ -1,10 +1,10 @@
 # 🎉 EventBus - Lightweight Event System in Kotlin
 
 **EventBus** is a **lightweight**, **flexible**, and **high-performance** event system built in **Kotlin**. It provides
-**synchronous event handling**, **priority-based event dispatching**, **powerful filtering mechanisms**, and **dynamic event branches**
+**synchronous event handling**, **priority-based event dispatching**, **powerful filtering mechanisms**, and **dynamic
+event branches**
 to help manage event-driven architectures efficiently.
 
----
 
 ## 🚀 Features
 
@@ -17,7 +17,6 @@ to help manage event-driven architectures efficiently.
 ✔ **Integrated Logging System (SLF4J)**  
 ✔ **Debug Mode for Event Tracking**
 
----
 
 ## 📦 Installation
 
@@ -37,7 +36,7 @@ repositories {
 }
 
 dependencies {
-    implementation("gg.levely.system:eventbus:2.0.0")
+    implementation("gg.levely.system:eventbus:2.1.0")
 }
 ```
 
@@ -55,11 +54,10 @@ repositories {
 }
 
 dependencies {
-    implementation "gg.levely.system:eventbus:2.0.0"
+    implementation "gg.levely.system:eventbus:2.1.0"
 }
 ```
 
----
 
 ## 🔑 Authentication
 
@@ -81,7 +79,6 @@ export GITHUB_TOKEN=your-personal-access-token
 
 > **Note:** The GitHub token must have `read:packages` permission.
 
----
 
 ## 🚀 Getting Started
 
@@ -130,7 +127,6 @@ val player = Player("Alice", 2000.0)
 eventBus.publish(PlayerJoinEvent(player))
 ```
 
----
 
 ## 🎯 Event Priorities
 
@@ -148,13 +144,13 @@ eventBus.subscribe<PlayerJoinEvent>(priority = EventPriority.LOW) { event ->
 
 ### Available Priorities:
 
-| Priority  | Weight | Description         |
-|-----------|--------|---------------------|
-| `HIGHEST` | 1000   | Executed first      |
-| `HIGH`    | 500    | High priority       |
-| `NORMAL`  | 0      | Default priority    |
-| `LOW`     | -500   | Low priority        |
-| `LOWEST`  | -1000  | Executed last       |
+| Priority  | Weight | Description      |
+|-----------|--------|------------------|
+| `HIGHEST` | 1000   | Executed first   |
+| `HIGH`    | 500    | High priority    |
+| `NORMAL`  | 0      | Default priority |
+| `LOW`     | -500   | Low priority     |
+| `LOWEST`  | -1000  | Executed last    |
 
 ### Custom Priorities:
 
@@ -165,8 +161,6 @@ val customPriority = EventPriority.of("CRITICAL", 2000)
 val beforeNormal = EventPriority.before(EventPriority.NORMAL, gap = 10)
 val afterHigh = EventPriority.after(EventPriority.HIGH, gap = 5)
 ```
-
----
 
 ## 🎭 Event Filtering
 
@@ -203,13 +197,13 @@ eventBus.subscribe<ProcessTransactionEvent>(filter = filterHighTransaction) { ev
 
 ### Available Filter Methods:
 
-| Filter Method | Description                                          |
-|---------------|------------------------------------------------------|
-| `exact()`     | Matches only the exact event type                    |
-| `hierarchy()` | Matches the event type and its subclasses            |
-| `filter()`    | Custom filter with a predicate                       |
-| `all()`       | Matches all events                                   |
-| `none()`      | Matches no events                                    |
+| Filter Method | Description                               |
+|---------------|-------------------------------------------|
+| `exact()`     | Matches only the exact event type         |
+| `hierarchy()` | Matches the event type and its subclasses |
+| `filter()`    | Custom filter with a predicate            |
+| `all()`       | Matches all events                        |
+| `none()`      | Matches no events                         |
 
 ### Combining Filters:
 
@@ -224,11 +218,11 @@ val orFilter = filter1 or filter2
 val notFilter = !someFilter
 ```
 
----
 
 ## 🌿 Event Branches
 
-**Event Branches** allow you to create isolated groups of event listeners that can be **attached** or **detached** dynamically. This is useful for managing temporary event handlers or modular event systems.
+**Event Branches** allow you to create isolated groups of event listeners that can be **attached** or **detached**
+dynamically. This is useful for managing temporary event handlers or modular event systems.
 
 ### Creating a Branch:
 
@@ -283,7 +277,6 @@ println(childBranch.getPath())
 
 > **Note**: When a parent branch is detached, all its children are also detached.
 
----
 
 ## 📊 Debug Mode & Logging
 
@@ -291,10 +284,11 @@ println(childBranch.getPath())
 
 ### 🔍 **Enable Debug Mode**
 
-You can enable debug logging by passing `enableLogger = true` to the EventBus constructor:
+You can enable debug logging by calling:
 
 ```kotlin
-val eventBus = EventBus<GameEvent>(enableLogger = true)
+val eventBus = EventBus<GameEvent>()
+eventBus.enableDebugLogger()
 ```
 
 ### 🔥 **Logging Events**
@@ -304,11 +298,13 @@ When debug mode is enabled, EventBus logs every **event registration, dispatch, 
 Example:
 
 ```kotlin
-val eventBus = EventBus<GameEvent>(enableLogger = true)
+val eventBus = EventBus<GameEvent>()
+eventBus.enableDebugLogger()
 
 eventBus.subscribe<PlayerJoinEvent> { event ->
     println("Player joined: ${event.player.name}")
 }
+// Will be logged
 
 eventBus.publish(PlayerJoinEvent(Player("Alice", 2000.0)))  // Will be logged
 ```
@@ -319,9 +315,9 @@ eventBus.publish(PlayerJoinEvent(Player("Alice", 2000.0)))  // Will be logged
 - `SUBSCRIBE`
 - `UNSUBSCRIBE`
 
-> **Note:** EventBus uses **SLF4J** for logging, so ensure you have an **SLF4J implementation** (e.g., **Logback** or **Log4j**).
+> **Note:** EventBus uses **SLF4J** for logging, so ensure you have an **SLF4J implementation** (e.g., **Logback** or *
+*Log4j**).
 
----
 
 ## 🙌 Credits
 

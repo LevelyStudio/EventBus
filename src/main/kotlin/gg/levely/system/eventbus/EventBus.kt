@@ -1,10 +1,9 @@
 package gg.levely.system.eventbus
 
 import gg.levely.system.eventbus.branch.BranchCreator
-import gg.levely.system.eventbus.branch.EventBranch
-import gg.levely.system.eventbus.EventContext
-import gg.levely.system.eventbus.filter.EventFilter
 import gg.levely.system.eventbus.branch.DefaultEventBranch
+import gg.levely.system.eventbus.branch.EventBranch
+import gg.levely.system.eventbus.filter.EventFilter
 import gg.levely.system.eventbus.logging.EventLogger
 import gg.levely.system.eventbus.logging.EventType
 import java.util.concurrent.ConcurrentSkipListSet
@@ -13,11 +12,8 @@ import java.util.concurrent.ConcurrentSkipListSet
  * Event bus that manages listeners and allows triggering custom events.
  *
  * @param T The base event type
- * @param enableLogger Enable debug logging for event operations
  */
-class EventBus<T>(
-    private val enableLogger: Boolean = false
-) : BranchCreator<T>, EventBroker<T>() {
+class EventBus<T> : BranchCreator<T>, EventBroker<T>() {
 
     /**
      * The set of registered event contexts.
@@ -55,18 +51,15 @@ class EventBus<T>(
             priority,
             filter
         )
-        eventContexts.add(context)
-        if (enableLogger) {
-            logger.logEvent(EventType.SUBSCRIBE, eventType, listener)
-        }
+
+        subscribe(context as EventContext<Any>)
+
         return context
     }
 
     internal fun subscribe(context: EventContext<Any>) {
         eventContexts.add(context)
-        if (enableLogger) {
-            logger.logEvent(EventType.SUBSCRIBE, context.eventType, context.listener)
-        }
+        logger.logEvent(EventType.SUBSCRIBE, context.eventType, context.listener)
     }
 
     /**
@@ -88,9 +81,7 @@ class EventBus<T>(
      */
     fun <E : T> unsubscribe(clazz: Class<E>, listener: EventListener<E>) {
         eventContexts.removeIf { it.eventType == clazz && it.listener == listener }
-        if (enableLogger) {
-            logger.logEvent(EventType.UNSUBSCRIBE, clazz, listener)
-        }
+        logger.logEvent(EventType.UNSUBSCRIBE, clazz, listener)
     }
 
     /**
@@ -100,9 +91,7 @@ class EventBus<T>(
      */
     fun unsubscribe(context: EventContext<Any>) {
         eventContexts.remove(context)
-        if (enableLogger) {
-            logger.logEvent(EventType.UNSUBSCRIBE, context.eventType, context.listener)
-        }
+        logger.logEvent(EventType.UNSUBSCRIBE, context.eventType, context.listener)
     }
 
     /**
@@ -114,6 +103,7 @@ class EventBus<T>(
      */
     override fun <E : T> publish(event: E): E {
         val eventClass = event!!::class.java
+        val shouldLog = logger.isDebugEnabled()
 
         eventContexts
             .asSequence()
@@ -125,7 +115,7 @@ class EventBus<T>(
                 @Suppress("UNCHECKED_CAST")
                 val listener = ctx.listener as EventListener<E>
 
-                if (enableLogger) {
+                if (shouldLog) {
                     logger.logEvent(EventType.PUBLISH, eventClass)
                 }
 

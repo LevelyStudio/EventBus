@@ -1,6 +1,6 @@
 package gg.levely.system.eventbus.branch
 
-import java.util.UUID
+import java.util.*
 
 interface BranchCreator<T> {
 
@@ -13,7 +13,9 @@ interface BranchCreator<T> {
 
         @JvmStatic
         fun generateBranchName(): String =
-            "branch-" + UUID.randomUUID().toString().slice(0..4)
+            "branch-" + UUID.randomUUID().toString()
+                .replace("-", "")
+                .take(8)
 
     }
 }
