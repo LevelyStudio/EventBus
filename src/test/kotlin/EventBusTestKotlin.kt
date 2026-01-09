@@ -1,14 +1,17 @@
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import gg.levely.system.eventbus.EventBus
 import gg.levely.system.eventbus.EventPriority
 import gg.levely.system.eventbus.branch.branch
 import gg.levely.system.eventbus.filter.EventFilters
+import org.slf4j.LoggerFactory
 
 fun main() {
     val player1 = Player("Alice", 2000.0)
     val player2 = Player("Bob", 1500.0)
 
     val eventBus = EventBus<GameEvent>()
-//    eventBus.enableDebugLogging()
+//    enableEventBusDebug()
 
     val customBranch = eventBus.branch {
         subscribe<PlayerJoinEvent> { event ->
@@ -39,4 +42,10 @@ fun main() {
 
     customBranch.reattach()
     eventBus.publish(PlayerJoinEvent(player2))
+
+}
+
+fun enableEventBusDebug() {
+    val logger = LoggerFactory.getLogger(EventBus::class.java) as Logger
+    logger.level = Level.DEBUG
 }

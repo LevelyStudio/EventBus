@@ -280,43 +280,54 @@ println(childBranch.getPath())
 
 ## 📊 Debug Mode & Logging
 
-**EventBus** includes a built-in **debug mode** that logs event activities such as publishing and subscribing.
+**EventBus** uses **SLF4J** for logging. Debug logs are available but disabled by default.
 
-### 🔍 **Enable Debug Mode**
+### 🔍 **Enable Debug Logging**
 
-You can enable debug logging by calling:
-
-```kotlin
-val eventBus = EventBus<GameEvent>()
-eventBus.enableDebugLogger()
+To see EventBus debug logs, configure your SLF4J implementation to set the log level to `DEBUG` for:
+```
+gg.levely.system.eventbus.EventBus
 ```
 
-### 🔥 **Logging Events**
+#### With Logback (`logback.xml`):
+```xml
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%logger{36}] %level - %msg%n</pattern>
+        </encoder>
+    </appender>
 
-When debug mode is enabled, EventBus logs every **event registration, dispatch, and unsubscription**.
+    <!-- Enable EventBus debug logging -->
+    <logger name="gg.levely.system.eventbus.EventBus" level="DEBUG"/>
 
-Example:
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
+```
 
+#### Programmatically (with Logback):
 ```kotlin
-val eventBus = EventBus<GameEvent>()
-eventBus.enableDebugLogger()
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import org.slf4j.LoggerFactory
 
-eventBus.subscribe<PlayerJoinEvent> { event ->
-    println("Player joined: ${event.player.name}")
+fun enableEventBusDebug() {
+    val logger = LoggerFactory.getLogger(EventBus::class.java) as Logger
+    logger.level = Level.DEBUG
 }
-// Will be logged
-
-eventBus.publish(PlayerJoinEvent(Player("Alice", 2000.0)))  // Will be logged
 ```
 
 ### 📌 **Logged Event Types**
 
-- `PUBLISH`
-- `SUBSCRIBE`
-- `UNSUBSCRIBE`
+| Type | Description |
+|------|-------------|
+| `PUBLISH` | When an event is published |
+| `SUBSCRIBE` | When a listener is registered |
+| `UNSUBSCRIBE` | When a listener is removed |
 
-> **Note:** EventBus uses **SLF4J** for logging, so ensure you have an **SLF4J implementation** (e.g., **Logback** or *
-*Log4j**).
+> **Note:** EventBus depends only on **SLF4J API**. You must provide an SLF4J implementation (e.g., **Logback**, **Log4j2**, **SLF4J-Simple**) in your project.
 
 
 ## 🙌 Credits
